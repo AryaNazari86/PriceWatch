@@ -1,11 +1,10 @@
 (() => {
-  const CIRCUMFERENCE = 2 * Math.PI * 82; // matches r=82 on .dial-progress
+  const CIRCUMFERENCE = 2 * Math.PI * 42; // matches r=42 on .mini-ring-progress
 
   const el = {
     dialProgress: document.getElementById("dial-progress"),
     dialTime: document.getElementById("dial-time"),
     dialStatus: document.getElementById("dial-status"),
-    tickMarks: document.getElementById("tick-marks"),
     refreshBtn: document.getElementById("refresh-btn"),
     lastResult: document.getElementById("last-result"),
     statTotal: document.getElementById("stat-total"),
@@ -22,20 +21,6 @@
   let nextCheckAtMs = 0;
   let fastPolling = false;
   let pollTimer = null;
-
-  function drawTickMarks() {
-    const cx = 100, cy = 100, r1 = 88, r2 = 80;
-    let svg = "";
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
-      const x1 = cx + r1 * Math.cos(angle);
-      const y1 = cy + r1 * Math.sin(angle);
-      const x2 = cx + r2 * Math.cos(angle);
-      const y2 = cy + r2 * Math.sin(angle);
-      svg += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" />`;
-    }
-    el.tickMarks.innerHTML = svg;
-  }
 
   function formatHMS(totalSeconds) {
     totalSeconds = Math.max(0, Math.round(totalSeconds));
@@ -107,9 +92,9 @@
   };
 
   const SPARK_COLOR = {
-    dropped: "--gold",
+    dropped: "--good",
     increased: "--danger",
-    lowest: "--violet",
+    lowest: "--accent",
   };
 
   function productCard(p) {
@@ -170,7 +155,7 @@
     el.dialProgress.classList.toggle("checking", sch.is_checking);
     el.dialStatus.textContent = sch.is_checking ? "checking now…" : "next check";
     el.refreshBtn.disabled = sch.is_checking;
-    el.refreshBtn.querySelector(".crown-icon").classList.toggle("spin", sch.is_checking);
+    el.refreshBtn.querySelector(".refresh-icon").classList.toggle("spin", sch.is_checking);
     el.lastResult.textContent = sch.last_result_summary || "";
 
     if (sch.is_checking && !fastPolling) startFastPolling();
@@ -253,7 +238,7 @@
 
   el.refreshBtn.addEventListener("click", async () => {
     el.refreshBtn.disabled = true;
-    el.refreshBtn.querySelector(".crown-icon").classList.add("spin");
+    el.refreshBtn.querySelector(".refresh-icon").classList.add("spin");
     try {
       const res = await fetch("/api/refresh", { method: "POST" });
       state = await res.json();
@@ -264,7 +249,6 @@
     }
   });
 
-  drawTickMarks();
   renderAll();
   setInterval(tickClock, 1000);
   tickClock();

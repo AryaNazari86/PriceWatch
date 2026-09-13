@@ -6,7 +6,7 @@
   <title>PriceWatch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
@@ -22,7 +22,6 @@
       </span>
       <div>
         <h1>PriceWatch</h1>
-        <p class="tagline">Watching prices, keeping time.</p>
       </div>
     </div>
     <a class="sample-link" href="/sample" target="_blank" rel="noopener">
@@ -31,71 +30,52 @@
     </a>
   </header>
 
-  <main>
-    <section class="watch-panel" aria-label="Auto-refresh countdown">
-      <div class="watch-face-wrap">
-        <svg class="watch-face" viewBox="0 0 200 200" role="img" aria-label="Countdown to next check">
-          <circle class="dial-outer-ring" cx="100" cy="100" r="94" />
-          <circle class="dial-bg" cx="100" cy="100" r="88" />
-          <g class="tick-marks" id="tick-marks"></g>
-          <circle class="dial-progress-track" cx="100" cy="100" r="82" />
-          <circle class="dial-progress" id="dial-progress" cx="100" cy="100" r="82"
-                  transform="rotate(-90 100 100)" />
-          <text class="dial-time" id="dial-time" x="100" y="96" text-anchor="middle">--:--:--</text>
-          <text class="dial-label" id="dial-status" x="100" y="119" text-anchor="middle">next check</text>
-        </svg>
-      </div>
-      <div class="watch-controls">
-        <button id="refresh-btn" class="crown-button">
-          <svg class="icon-md crown-icon" id="refresh-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 4V9H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4.5 15C5.79 18.53 9.13 21 13 21C17.97 21 22 16.97 22 12C22 7.03 17.97 3 13 3C9.6 3 6.63 4.85 5.07 7.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Refresh now
-        </button>
-        <p class="last-result" id="last-result"></p>
-      </div>
-    </section>
+  <div class="status-strip">
+    <div class="status-clock">
+      <svg class="mini-ring" viewBox="0 0 100 100" role="img" aria-label="Countdown to next check">
+        <circle class="mini-ring-track" cx="50" cy="50" r="42" />
+        <circle class="mini-ring-progress" id="dial-progress" cx="50" cy="50" r="42" transform="rotate(-90 50 50)" />
+      </svg>
+      <span class="status-time" id="dial-time">--:--:--</span>
+      <span class="status-caption" id="dial-status">next check</span>
+    </div>
+    <button id="refresh-btn" class="refresh-link">
+      <svg class="icon-sm refresh-icon" id="refresh-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 4V9H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4.5 15C5.79 18.53 9.13 21 13 21C17.97 21 22 16.97 22 12C22 7.03 17.97 3 13 3C9.6 3 6.63 4.85 5.07 7.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Refresh now
+    </button>
+    <p class="last-result" id="last-result"></p>
+    <div class="status-stats">
+      <span><strong id="stat-total">$0.00</strong> watched</span>
+      <span class="status-dot" aria-hidden="true">&middot;</span>
+      <span><strong id="stat-count">0</strong> item(s)</span>
+    </div>
+  </div>
 
-    <section class="summary-bar" aria-label="Watchlist summary">
-      <div class="stat-tile">
-        <span class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M3 7C3 5.34315 4.34315 4 6 4H18C19.6569 4 21 5.34315 21 7V17C21 18.6569 19.6569 20 18 20H6C4.34315 20 3 18.6569 3 17V7Z" stroke="currentColor" stroke-width="1.6"/><path d="M3 10H21" stroke="currentColor" stroke-width="1.6"/><path d="M7 15H10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        </span>
-        <span class="stat-value" id="stat-total">$0.00</span>
-        <span class="stat-label">Total watched value</span>
-      </div>
-      <div class="stat-tile">
-        <span class="stat-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6H20M4 12H20M4 18H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        </span>
-        <span class="stat-value" id="stat-count">0</span>
-        <span class="stat-label">Items on watchlist</span>
-      </div>
-    </section>
-
-    <section class="add-panel">
-      <form id="add-form">
-        <label for="input-url" class="sr-only">Product URL</label>
-        <input type="url" id="input-url" placeholder="https://store.example.com/product/..." required />
-        <button type="submit">
-          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-          Add to watchlist
-        </button>
-      </form>
-      <p class="form-error" id="add-error" hidden></p>
-    </section>
-
-    <section class="watchlist" id="watchlist" aria-label="Watched products">
-      <div class="empty-state" id="empty-state" hidden>
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/>
-          <path d="M12 8.5V12L14.2 13.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <p>Nothing on the watchlist yet — add a product above.</p>
-      </div>
-    </section>
+  <main class="hero">
+    <h2 class="hero-heading">What should we watch?</h2>
+    <form id="add-form" class="search-pill">
+      <svg class="pill-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10.5 13.5L13.5 10.5M8.5 15.5L6.34 17.66C4.95 19.05 4.95 21.3 6.34 22.69C7.73 24.08 9.98 24.08 11.37 22.69L13.5 20.5M15.5 8.5L17.66 6.34C19.05 4.95 19.05 2.7 17.66 1.31C16.27 -0.08 14.02 -0.08 12.63 1.31L10.5 3.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 2)"/></svg>
+      <label for="input-url" class="sr-only">Product URL</label>
+      <input type="url" id="input-url" placeholder="Paste a product link to start watching..." required />
+      <button type="submit" class="pill-submit" aria-label="Add to watchlist" title="Add to watchlist">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+    <p class="form-error" id="add-error" hidden></p>
   </main>
+
+  <section class="watchlist" id="watchlist" aria-label="Watched products">
+    <div class="empty-state" id="empty-state" hidden>
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M12 8.5V12L14.2 13.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <p>Nothing on the watchlist yet — add a product above.</p>
+    </div>
+  </section>
 
   <script id="initial-state" type="application/json">{{ state | tojson }}</script>
   <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
