@@ -37,6 +37,11 @@ def fetch_page_text(url: str) -> str:
                 # Steel sessions come with a context already attached.
                 context = browser.contexts[0]
                 page = context.new_page()
+                # Harmless for every other site; required if the URL is a
+                # free-tier ngrok tunnel (e.g. the sample page during a demo)
+                # — without it, Steel would scrape ngrok's "you're about to
+                # visit a tunnel" interstitial instead of the real page.
+                page.set_extra_http_headers({"ngrok-skip-browser-warning": "true"})
                 page.goto(
                     url,
                     wait_until="domcontentloaded",
@@ -45,13 +50,16 @@ def fetch_page_text(url: str) -> str:
                 # Many stores render price via a client-side widget after the
                 # shell loads. Give the network a chance to go quiet (catches
                 # that async fetch) but don't block forever on pages with
-                # chatty analytics/polling that never fully idle.
+                # chatty analytics/polling that never fully idle. This is
+                # generous on purpose: every product in a watchlist check
+                # runs concurrently (see checker.py), so the wait is paid
+                # once per batch, not once per product.
                 try:
-                    page.wait_for_load_state("networkidle", timeout=6000)
+                    page.wait_for_load_state("networkidle", timeout=config.NETWORK_IDLE_TIMEOUT_MS)
                 except PlaywrightTimeoutError:
                     pass
                 # Final settle buffer for any last render pass.
-                page.wait_for_timeout(1500)
+                page.wait_for_timeout(config.PAGE_SETTLE_MS)
                 return page.inner_text("body")
             finally:
                 browser.close()

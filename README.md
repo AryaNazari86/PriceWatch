@@ -27,13 +27,22 @@ PriceWatch catch it — on the dashboard and in your inbox.
 
 The core feature — checking every watchlist product against Steel at once —
 doesn't need `asyncio` to be real. `app/checker.py` fans the whole watchlist
-out across a `concurrent.futures.ThreadPoolExecutor` (size set by
-`STEEL_MAX_CONCURRENCY`), and each worker thread creates and drives its own
-`sync_playwright()` instance — which is exactly the pattern Playwright's own
-docs describe for using the sync API from multiple threads. Steel's sync
-client and the Anthropic SDK are both safe to call concurrently from separate
-threads too. So N products really do get checked against N live Steel
-sessions at the same time.
+out across a `concurrent.futures.ThreadPoolExecutor` sized to the watchlist
+itself (one worker per product, no artificial cap), and each worker thread
+creates and drives its own `sync_playwright()` instance — which is exactly
+the pattern Playwright's own docs describe for using the sync API from
+multiple threads. Steel's sync client and the Anthropic SDK are both safe to
+call concurrently from separate threads too. So N products really do get
+checked against N live Steel sessions at the same time.
+
+One consequence: the per-page wait time in `app/steel_checker.py`
+(`NETWORK_IDLE_TIMEOUT_MS` / `PAGE_SETTLE_MS` — how long it lets a page's
+network go quiet before reading its text, needed because many stores render
+price via a client-side widget after the page shell loads) is essentially
+free at the batch level. It's paid once per batch, concurrently, not once
+per product — checking 10 products with a 10s wait takes about the same
+wall-clock time as checking 1, not 10x. That's why these are tuned generous
+rather than tight.
 
 ### How price-change detection works
 
@@ -69,22 +78,44 @@ and fill in:
 
 Then open **http://127.0.0.1:8000**.
 
-## Demoing the live price-change flow
+## Demoing the live price-change flow (for judges)
 
 Steel sessions run in the cloud, so they can't reach `127.0.0.1` on your
-laptop directly. To let the cloud browser see your local sample page during
-a demo, expose it with a tunnel (e.g. `ngrok http 8000`) and use the
-resulting public URL instead of `127.0.0.1` when adding the sample product.
+laptop directly. Expose your local server with a tunnel and use the public
+URL instead of `127.0.0.1` when adding the sample product.
 
-1. Start a tunnel: `ngrok http 8000` (or any tunnel tool you have) and copy
-   the `https://...ngrok...` URL it prints.
-2. On the dashboard, add `<that-ngrok-url>/sample` to the watchlist.
-3. Open `<that-ngrok-url>/sample` in another tab — it has a small "PriceWatch
-   demo controls" box at the bottom, separate from the fake store page above it.
-4. Change the price (or click "−$50 (trigger a drop)").
-5. Back on the dashboard, click **Refresh now**. The card should flip to a
-   pulsing **Price dropped!** state within a few seconds, and (if Resend is
-   configured) an email should land shortly after.
+**Setup (do this once, before judges are watching):**
+
+1. In a spare terminal: `ngrok http 8000` — copy the `https://<random>.ngrok-free.app`
+   URL it prints. (Keep this terminal open for the whole demo — closing it kills the tunnel.)
+   - Free-tier ngrok shows a "you're visiting a tunnel" interstitial to first-time
+     browser visitors. That's already handled: `app/steel_checker.py` sends the
+     `ngrok-skip-browser-warning` header on every fetch, so Steel scrapes the real
+     page, not the warning screen. This only affects our own scraper — if *you*
+     open the ngrok URL in your own browser, you'll still see that interstitial
+     once; just click through it.
+2. On the dashboard, add `<ngrok-url>/sample` to the watchlist and confirm it
+   comes back with a real title/price (not an error) — this proves the tunnel
+   and Steel can both reach it, before you're on stage.
+3. Open `<ngrok-url>/sample` in another tab and click through the ngrok
+   interstitial once (see above). You should land on the "Aether Automatic
+   Chronograph" page with the demo controls box at the bottom.
+
+**The live demo:**
+
+1. Point at the dashboard — the countdown ring, summary stats, watchlist.
+2. Switch to the sample-page tab, click **"−$50 (trigger a drop)"**.
+3. Switch back to the dashboard, click **Refresh now**.
+4. Within a few seconds the card flips to a pulsing **Price dropped!** state
+   with the new price and the amount it dropped by; if Resend is configured,
+   an email lands shortly after — worth having your inbox open on a second
+   screen/tab as a payoff beat.
+
+**Backup plan:** if ngrok has any hiccup live (rate limits, a stale tunnel
+URL, wifi issues), `cloudflared tunnel --url http://localhost:8000` (`brew
+install cloudflared`) is a solid fallback — it has no interstitial at all,
+so it needs no special header handling. Test whichever one you'll rely on
+end-to-end at least once before you're in front of judges.
 
 ## Notes / non-goals
 

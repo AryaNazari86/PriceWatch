@@ -1,9 +1,8 @@
 """Whole-watchlist check: run the single-product checker for every product
 *in parallel* using a thread pool, then persist results and notify on change.
 
-This is the headline feature: with N products, this fires up to
-STEEL_MAX_CONCURRENCY real Steel cloud-browser sessions at once instead of
-checking products one by one.
+This is the headline feature: with N products, this fires N real Steel
+cloud-browser sessions all at once instead of checking products one by one.
 """
 from __future__ import annotations
 
@@ -80,14 +79,15 @@ def check_all_products() -> list[Product]:
     if not products:
         return []
 
-    logger.info(
-        "Checking %d product(s) in parallel (max %d at once)...",
-        len(products),
-        config.STEEL_MAX_CONCURRENCY,
-    )
+    logger.info("Checking %d product(s), all in parallel...", len(products))
 
+    # One worker per product — every product in the watchlist gets its own
+    # concurrent Steel session at once, no artificial batching. Wait times
+    # inside a single check (see steel_checker.py) are effectively free at
+    # the batch level because of this: they're paid once, concurrently,
+    # not once per product.
     updated: list[Product] = []
-    with ThreadPoolExecutor(max_workers=config.STEEL_MAX_CONCURRENCY) as pool:
+    with ThreadPoolExecutor(max_workers=len(products)) as pool:
         future_to_product = {pool.submit(check_product_url, p.url): p for p in products}
         for future in as_completed(future_to_product):
             product = future_to_product[future]

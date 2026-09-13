@@ -26,8 +26,13 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 LLM_MODEL = os.getenv("LLM_MODEL", "claude-haiku-4-5")
 
 CHECK_INTERVAL_SECONDS = int(os.getenv("CHECK_INTERVAL_SECONDS", str(24 * 60 * 60)))
-STEEL_MAX_CONCURRENCY = int(os.getenv("STEEL_MAX_CONCURRENCY", "5"))
 PAGE_NAV_TIMEOUT_MS = int(os.getenv("PAGE_NAV_TIMEOUT_MS", "30000"))
+# How long to let the page network go quiet, and a final settle buffer, before
+# reading its text. Generous by design: every product's watchlist check runs
+# concurrently (see checker.py), so this cost is paid once per batch, not
+# once per product — there's little reason to keep it tight.
+NETWORK_IDLE_TIMEOUT_MS = int(os.getenv("NETWORK_IDLE_TIMEOUT_MS", "10000"))
+PAGE_SETTLE_MS = int(os.getenv("PAGE_SETTLE_MS", "2500"))
 
 HOST = os.getenv("HOST", "127.0.0.1")
 PORT = int(os.getenv("PORT", "8000"))
