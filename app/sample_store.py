@@ -14,11 +14,11 @@ from . import config
 _lock = threading.Lock()
 
 DEFAULT_PRODUCT = {
-    "title": "Aether Automatic Chronograph",
+    "title": "Jean Paul Gaultier Le Male Elixir",
     "price": 249.00,
     "currency": "USD",
     "in_stock": True,
-    "tagline": "Sapphire crystal. 42mm stainless case. 5-year movement warranty.",
+    "tagline": "Lavender & Tonka Bean",
 }
 
 

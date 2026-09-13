@@ -192,7 +192,6 @@
   <div class="demo-panel">
     <fieldset>
       <legend>PriceWatch Demo Controls</legend>
-      <p>This box simulates a price change on this store page — it isn't part of the real listing above. Add this page's URL to your PriceWatch watchlist, then use these controls during the demo.</p>
       <form method="post" action="/sample/price">
         <input type="number" name="price" step="0.01" min="0" placeholder="New price"
                value="{{ '%.2f'|format(product.price) }}" />
