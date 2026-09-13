@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ product.title }} — Horizon Outfitters</title>
+  <title>{{ product.title }} — Maison Luxe</title>
   <style>
     :root {
-      --ink: #1c1c1e;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --accent: #b5472b;
-      --bg: #fafaf8;
+      /* Dark Luxury Theme */
+      --ink: #f3f4f6;
+      --muted: #9ca3af;
+      --line: #272b35;
+      --accent: #d4af37; /* Gold */
+      --bg: #0f1115;
+      --card-bg: #181b22;
     }
     * { box-sizing: border-box; }
     body {
@@ -20,16 +22,17 @@
       color: var(--ink);
     }
     header.store-nav {
-      background: #ffffff;
+      background: rgba(15, 17, 21, 0.95);
       border-bottom: 1px solid var(--line);
       padding: 18px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .store-logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.02em; }
+    .store-logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase; }
     .store-logo span { color: var(--accent); }
-    nav.store-links { display: flex; gap: 24px; color: var(--muted); font-size: 0.9rem; }
+    nav.store-links { display: flex; gap: 24px; color: var(--muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    
     main.pdp {
       max-width: 980px;
       margin: 48px auto;
@@ -39,107 +42,135 @@
       gap: 48px;
     }
     .pdp-image {
-      background: linear-gradient(160deg, #efe7da, #d8cdb8);
       border-radius: 12px;
       aspect-ratio: 1 / 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 5rem;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
     }
-    .pdp-info .breadcrumb { color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; }
-    .pdp-info h1 { font-size: 1.9rem; margin: 0 0 6px; }
-    .pdp-info .tagline { color: var(--muted); margin: 0 0 20px; }
+    .pdp-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .pdp-info .breadcrumb { color: var(--muted); font-size: 0.85rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pdp-info h1 { font-size: 2.2rem; margin: 0 0 6px; font-weight: 700; letter-spacing: -0.02em; }
+    .pdp-info .tagline { color: var(--accent); margin: 0 0 20px; font-size: 1.1rem; }
     .price-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
     .price { font-size: 2.1rem; font-weight: 700; }
     .stock {
       display: inline-block;
       font-size: 0.8rem;
       font-weight: 600;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 999px;
       margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    .stock.in { background: #e6f4ea; color: #1e7e34; }
-    .stock.out { background: #fdeaea; color: #b3261e; }
+    .stock.in { background: rgba(212, 175, 55, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .stock.out { background: rgba(179, 38, 30, 0.1); color: #ef4444; border: 1px solid #ef4444; }
     .buy-btn {
-      background: var(--ink);
-      color: white;
+      background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+      color: #000;
       border: none;
-      padding: 14px 28px;
+      padding: 16px 28px;
       border-radius: 8px;
       font-size: 1rem;
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
       max-width: 320px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .buy-btn:hover {
+      opacity: 0.9;
     }
     .details {
       margin-top: 28px;
       padding-top: 20px;
       border-top: 1px solid var(--line);
-      color: #374151;
-      font-size: 0.92rem;
-      line-height: 1.6;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
     }
 
+    /* Demo Panel styling adapted for dark mode */
     .demo-panel {
       max-width: 980px;
       margin: 0 auto 56px;
       padding: 20px 32px;
     }
     .demo-panel fieldset {
-      border: 1.5px dashed #c9a08c;
+      border: 1px solid var(--accent);
       border-radius: 10px;
-      background: #fff8f3;
-      padding: 16px 20px;
+      background: var(--card-bg);
+      padding: 20px;
     }
     .demo-panel legend {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 0 6px;
+      letter-spacing: 0.05em;
+      padding: 0 10px;
+      background: var(--card-bg);
     }
-    .demo-panel p { color: var(--muted); font-size: 0.85rem; margin: 0 0 12px; }
+    .demo-panel p { color: var(--muted); font-size: 0.9rem; margin: 0 0 16px; line-height: 1.5; }
     .demo-panel form { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .demo-panel input[type="number"] {
-      padding: 9px 12px;
+      padding: 10px 14px;
       border: 1px solid var(--line);
       border-radius: 6px;
       font-size: 0.95rem;
       width: 140px;
+      background: var(--bg);
+      color: var(--ink);
     }
     .demo-panel button {
-      padding: 9px 16px;
+      padding: 10px 18px;
       border-radius: 6px;
-      border: 1px solid var(--ink);
-      background: white;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--ink);
       cursor: pointer;
       font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
     }
-    .demo-panel button.primary { background: var(--ink); color: white; }
-    .demo-panel .quick-row { display: flex; gap: 8px; margin-top: 10px; }
+    .demo-panel button:hover {
+      background: #272b35;
+    }
+    .demo-panel button.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+    .demo-panel button.primary:hover { background: #aa820a; }
+    .demo-panel .quick-row { display: flex; gap: 10px; margin-top: 12px; }
   </style>
 </head>
 <body>
   <header class="store-nav">
-    <div class="store-logo">HORIZON <span>OUTFITTERS</span></div>
+    <div class="store-logo">MAISON <span>LUXE</span></div>
     <nav class="store-links">
-      <span>Watches</span><span>Bags</span><span>Eyewear</span><span>Sale</span>
+      <span>Fragrances</span><span>Body</span><span>Gifts</span><span>Discover</span>
     </nav>
   </header>
 
   <main class="pdp">
-    <div class="pdp-image">&#8986;</div>
+    <div class="pdp-image">
+      <!-- Using the exact image file requested -->
+      <img src="{{ url_for('static', filename='image_9f70ef.jpg') }}" alt="Jean Paul Gaultier Le Male Elixir" />
+    </div>
     <div class="pdp-info">
-      <p class="breadcrumb">Home / Watches / Chronographs</p>
+      <p class="breadcrumb">Home / Fragrances / Intense</p>
       <h1>{{ product.title }}</h1>
-      <p class="tagline">{{ product.tagline }}</p>
+      <p class="tagline">Lavender & Tonka Bean</p>
 
       <div class="price-row">
         <span class="price">${{ "%.2f"|format(product.price) }}</span>
-        <span style="color:#9ca3af; text-decoration: line-through; font-size: 1rem;">
+        <span style="color:var(--muted); text-decoration: line-through; font-size: 1rem;">
           ${{ "%.2f"|format(product.price * 1.2) }}
         </span>
       </div>
@@ -148,34 +179,32 @@
       </span>
 
       <div>
-        <button class="buy-btn">Add to Cart</button>
+        <button class="buy-btn">Add to Bag</button>
       </div>
 
       <div class="details">
-        Precision automatic movement housed in a brushed stainless case.
-        Scratch-resistant sapphire crystal, 100m water resistance, and a
-        5-year international warranty. Ships in 2–4 business days.
+        Discover the intense magnetism of Jean Paul Gaultier Le Male Elixir. A rich, fiery fragrance blending aromatic organic lavender, warm tropical tonka bean, and captivating deep benzoin resin. Encased in the iconic golden torso bottle. Ships in 2–4 business days.
       </div>
     </div>
   </main>
 
+  <!-- DEMO CONTROLS (Your backend Python logic stays identical) -->
   <div class="demo-panel">
     <fieldset>
-      <legend>PriceWatch demo controls</legend>
-      <p>This box simulates a price change on this store page — it isn't part of the real listing above.
-         Add this page's URL to your PriceWatch watchlist, then use these controls during the demo.</p>
+      <legend>PriceWatch Demo Controls</legend>
+      <p>This box simulates a price change on this store page — it isn't part of the real listing above. Add this page's URL to your PriceWatch watchlist, then use these controls during the demo.</p>
       <form method="post" action="/sample/price">
         <input type="number" name="price" step="0.01" min="0" placeholder="New price"
                value="{{ '%.2f'|format(product.price) }}" />
-        <button type="submit" class="primary">Set price</button>
+        <button type="submit" class="primary">Set Price</button>
       </form>
       <div class="quick-row">
         <form method="post" action="/sample/price">
           <input type="hidden" name="price" value="{{ '%.2f'|format(product.price - 50) }}" />
-          <button type="submit">&minus;$50 (trigger a drop)</button>
+          <button type="submit">&minus;$50 (Trigger a Drop)</button>
         </form>
         <form method="post" action="/sample/reset">
-          <button type="submit">Reset to $249.00</button>
+          <button type="submit">Reset to Original Price</button>
         </form>
       </div>
     </fieldset>
