@@ -14,12 +14,10 @@ Routes:
 from __future__ import annotations
 
 import logging
-import threading
 
 from flask import Flask, jsonify, redirect, render_template, request, url_for
 
 from . import config, sample_store, storage
-from .checker import check_one_and_store
 from .scheduler import scheduler
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -63,11 +61,13 @@ def api_add_product():
     if not url:
         return jsonify({"error": "url is required"}), 400
 
-    product = storage.add_product(url=url)
+    storage.add_product(url=url)
 
-    # Kick off an immediate check for just this product so the dashboard
-    # populates real data without waiting for the next full refresh.
-    threading.Thread(target=check_one_and_store, args=(product.id,), daemon=True).start()
+    # Adding a product triggers the same full-watchlist refresh as clicking
+    # "Refresh now" — it checks the new item immediately (along with
+    # everything else already on the list) and resets the countdown, rather
+    # than quietly checking just the new product in the background.
+    scheduler.trigger_now()
 
     return jsonify(_full_state()), 201
 
